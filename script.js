@@ -13,6 +13,17 @@ if (typeof location !== 'undefined' && location.protocol === 'file:') {
 } else {
   BASE_URL = getSavedEndpoint() || '';
 }
+
+// If this site is served from the GitHub Pages URL for this repo and
+// no endpoint is saved, default to the current public tunnel so the
+// published site works without manual settings (ephemeral URL).
+try {
+  if (!getSavedEndpoint() && typeof location !== 'undefined' && location.hostname === 'okayowhy.github.io' && location.pathname.startsWith('/okayo-website')) {
+    const defaultEndpoint = 'https://legal-geese-do.loca.lt';
+    try { localStorage.setItem('ollama_endpoint', defaultEndpoint); } catch (e) {}
+    BASE_URL = defaultEndpoint;
+  }
+} catch (e) {}
 const heroEl = document.getElementById('hero');
 const chatEl = document.getElementById('chat');
 const whyButton = document.getElementById('why-button');
