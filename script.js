@@ -1,3 +1,18 @@
+// Determine BASE_URL from saved setting or fallback. If opened via file://, default to localhost proxy.
+function getSavedEndpoint() {
+  try {
+    return (localStorage.getItem('ollama_endpoint') || '').trim();
+  } catch (e) {
+    return '';
+  }
+}
+
+let BASE_URL = '';
+if (typeof location !== 'undefined' && location.protocol === 'file:') {
+  BASE_URL = getSavedEndpoint() || 'http://127.0.0.1:3000';
+} else {
+  BASE_URL = getSavedEndpoint() || '';
+}
 const heroEl = document.getElementById('hero');
 const chatEl = document.getElementById('chat');
 const whyButton = document.getElementById('why-button');
@@ -83,7 +98,8 @@ async function sendMessage() {
   const bubbleEl = placeholder ? placeholder.querySelector('.bubble') : null;
 
   try {
-    const resp = await fetch(`/api/generate`, {
+    const endpoint = BASE_URL ? `${BASE_URL}/api/generate` : '/api/generate';
+    const resp = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: text }),
@@ -156,17 +172,42 @@ inputEl.addEventListener('keydown', (e) => {
 
 async function refreshStatus() {
   try {
-    const response = await fetch('/health');
+    const healthUrl = BASE_URL ? `${BASE_URL}/health` : '/health';
+    const response = await fetch(healthUrl);
     if (!response.ok) {
-      statusEl.textContent = 'Ollama: down';
+      statusEl.textContent = (BASE_URL ? `Ollama (${BASE_URL}): down` : 'Ollama: down');
       return;
     }
     const json = await response.json().catch(() => null);
-    statusEl.textContent = json && json.ok ? 'Ollama: up' : 'Ollama: limited';
+    statusEl.textContent = json && json.ok ? (BASE_URL ? `Ollama (${BASE_URL}): up` : 'Ollama: up') : 'Ollama: limited';
   } catch (error) {
-    statusEl.textContent = 'Ollama: unreachable';
+    statusEl.textContent = BASE_URL ? `Ollama (${BASE_URL}): unreachable` : 'Ollama: unreachable';
   }
 }
 
 refreshStatus();
 setInterval(refreshStatus, 15000);
+
+// Settings button: allow user to set a public Ollama endpoint (e.g. ngrok/localtunnel URL)
+const settingsBtn = document.getElementById('settings-button');
+if (settingsBtn) {
+  settingsBtn.addEventListener('click', () => {
+    const current = getSavedEndpoint();
+    const hint = current || (location.protocol === 'https:' ? 'https://your-tunnel.example' : 'http://127.0.0.1:3000');
+    const input = prompt('Введите публичный URL Ollama (https://...) или оставьте пустым для локального сервера:', hint);
+    if (input === null) return; // cancelled
+    const value = (input || '').trim();
+    try {
+      if (value) localStorage.setItem('ollama_endpoint', value);
+      else localStorage.removeItem('ollama_endpoint');
+    } catch (e) {}
+    // Update BASE_URL and refresh status
+    if (typeof location !== 'undefined' && location.protocol === 'file:') {
+      BASE_URL = getSavedEndpoint() || 'http://127.0.0.1:3000';
+    } else {
+      BASE_URL = getSavedEndpoint() || '';
+    }
+    refreshStatus();
+    alert('Endpoint сохранён. Если страница работает на HTTPS, используйте HTTPS endpoint.');
+  });
+}
