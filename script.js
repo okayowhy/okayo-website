@@ -18,10 +18,28 @@ if (typeof location !== 'undefined' && location.protocol === 'file:') {
 // no endpoint is saved, default to the current public tunnel so the
 // published site works without manual settings (ephemeral URL).
 try {
-  if (!getSavedEndpoint() && typeof location !== 'undefined' && location.hostname === 'okayowhy.github.io' && location.pathname.startsWith('/okayo-website')) {
-    const defaultEndpoint = 'https://legal-geese-do.loca.lt';
-    try { localStorage.setItem('ollama_endpoint', defaultEndpoint); } catch (e) {}
-    BASE_URL = defaultEndpoint;
+  // If no saved endpoint and this page is served from GitHub Pages (or any github.io host),
+  // try to fetch a published `/endpoint.json` file from the site root. That file should
+  // contain { "endpoint": "https://your-tunnel.loca.lt" } and allows the published
+  // site to pick up the current public tunnel URL without hardcoding it here.
+  if (!getSavedEndpoint() && typeof location !== 'undefined' && (location.hostname === 'okayowhy.github.io' || location.hostname.endsWith('.github.io'))) {
+    (async () => {
+      try {
+        const res = await fetch('/endpoint.json', { cache: 'no-cache' });
+        if (res.ok) {
+          const obj = await res.json().catch(() => null);
+          if (obj && obj.endpoint) {
+            const ep = (obj.endpoint || '').trim();
+            if (ep) {
+              try { localStorage.setItem('ollama_endpoint', ep); } catch (e) {}
+              BASE_URL = ep;
+            }
+          }
+        }
+      } catch (e) {
+        // ignore — we'll fall back to saved endpoint or empty
+      }
+    })();
   }
 } catch (e) {}
 const heroEl = document.getElementById('hero');
@@ -196,6 +214,8 @@ async function refreshStatus() {
   }
 }
 
+// Perform initial health check and poll; the init IIFE above will set `BASE_URL`
+// (if `/endpoint.json` exists) before the first check completes in most cases.
 refreshStatus();
 setInterval(refreshStatus, 15000);
 
