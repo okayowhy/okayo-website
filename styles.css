@@ -1,0 +1,300 @@
+:root {
+  color-scheme: dark;
+  --background: #050608;
+  --surface: rgba(7, 10, 15, 0.84);
+  --foreground: #f5f7fa;
+  --muted: rgba(245, 247, 250, 0.6);
+  --accent: #00d4ff;
+  --accent-soft: rgba(0, 212, 255, 0.24);
+  --border: rgba(255, 255, 255, 0.08);
+  --shadow: 0 34px 120px rgba(0, 0, 0, 0.22);
+  --radius: 1.25rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  overflow: hidden;
+  background-image:
+    radial-gradient(circle at top, rgba(0, 212, 255, 0.10), transparent 40%),
+    linear-gradient(180deg, rgba(11, 13, 19, 0.9) 0%, rgba(8, 11, 17, 0.98) 45%, rgba(5, 6, 8, 1) 100%),
+    url('visual.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at bottom, rgba(0, 212, 255, 0.15), transparent 32%);
+}
+
+.app {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.status {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  background: rgba(10, 14, 20, 0.72);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  backdrop-filter: blur(18px);
+}
+
+.content {
+  width: min(1100px, calc(100% - 32px));
+  margin: 0 auto;
+  flex: 1;
+}
+
+.hero,
+.chat {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero {
+  text-align: center;
+  padding: 3rem 0;
+  gap: 1.5rem;
+}
+
+.hero-title {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+  font-size: clamp(3.6rem, 7vw, 8rem);
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 0 40px rgba(0, 212, 255, 0.08);
+}
+
+.hero-action {
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.62);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+  font-size: clamp(1.1rem, 2vw, 1.45rem);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  letter-spacing: 0.02em;
+}
+
+.hero-action:hover,
+.hero-action:focus-visible {
+  color: var(--accent);
+  outline: none;
+  text-shadow: 0 0 30px var(--accent), 0 0 60px var(--accent);
+}
+
+.hero-action span {
+  margin-left: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.hero-action:hover span {
+  opacity: 1;
+  animation: blink 1s step-end infinite;
+}
+
+.chat {
+  padding: 4rem 0 2rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.chat-side {
+  width: 180px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.chat-main {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1100px;
+  margin-top: 3rem;
+  padding: 0 1rem;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 58%;
+  max-width: 640px;
+  min-width: 300px;
+  overflow-y: auto;
+  max-height: calc(100vh - 14rem);
+}
+
+.message {
+  display: inline-grid;
+  gap: 0.65rem;
+  align-self: start;
+  animation: fade-in-up 0.5s ease-out both;
+}
+
+.message.user {
+  justify-self: end;
+  text-align: right;
+}
+
+.bubble {
+  display: inline-block;
+  padding: 1rem 1.2rem;
+  border-radius: 1.2rem;
+  max-width: min(85vw, 620px);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+  font-size: clamp(1rem, 1.2vw, 1.55rem);
+  line-height: 1.2;
+  color: var(--foreground);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+.message.user .bubble {
+  color: var(--accent);
+  background: rgba(0, 212, 255, 0.16);
+  border-color: rgba(0, 212, 255, 0.24);
+  text-shadow: 0 0 18px rgba(0, 212, 255, 0.22);
+}
+
+.meta {
+  font-size: 0.85rem;
+  color: rgba(245, 247, 250, 0.55);
+}
+
+.input-panel {
+  width: 42%;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.input-panel .input-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 0;
+}
+
+.input-wrapper::before {
+  content: '>';
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+  font-size: 1.35rem;
+}
+
+#input {
+  width: 100%;
+  padding: 1rem 1rem 1rem 2.5rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--foreground);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+  font-size: 1.1rem;
+  outline: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+#input::placeholder {
+  color: rgba(245, 247, 250, 0.4);
+}
+
+#send {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+  font-size: 1rem;
+  padding: 0.5rem 0.85rem;
+}
+
+#send:hover {
+  color: var(--accent);
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .chat-main {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 5rem;
+  }
+
+  .messages,
+  .input-panel,
+  .chat-side {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}

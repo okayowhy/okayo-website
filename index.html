@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>okayo.</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app">
+      <div id="status" class="status">Checking...</div>
+      <main class="content">
+        <section id="hero" class="hero">
+          <h1 class="hero-title">okayo.</h1>
+          <button id="why-button" class="hero-action" type="button">
+            why?<span>|</span>
+          </button>
+        </section>
+
+        <section id="chat" class="chat hidden">
+          <div class="chat-main">
+            <div class="chat-side">
+              <button id="back-button" class="hero-action" type="button">why? again /<span>|</span></button>
+            </div>
+            <div id="messages" class="messages"></div>
+            <div class="input-panel">
+              <div class="input-wrapper">
+                <input id="input" type="text" placeholder="" autocomplete="off" spellcheck="false" />
+                <button id="send" type="button">send</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@2.4.0/dist/purify.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
